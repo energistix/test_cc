@@ -10,6 +10,8 @@
     "strictNullChecks": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "lib": ["dom"]
+    "lib": ["dom"],
+    "esModuleInterop": true,
+    "watch": true
   }
 }
