@@ -10,10 +10,17 @@ datasource db {
   url      = "./data.db"
 }
 
+model turtle {
+  label       String      @id @unique
+  inventories inventory[]
+}
+
 model inventory {
-  id   Int    @id
-  name String
-  slots slot[]
+  id          Int    @id
+  name        String
+  slots       slot[]
+  turtle      turtle @relation(fields: [turtleLabel], references: [label])
+  turtleLabel String
 }
 
 model slot {

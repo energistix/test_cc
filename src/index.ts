@@ -1,19 +1,13 @@
 console.clear()
 
-import express from "express"
-import { createServer } from "http"
-const app = express()
-const server = createServer(app)
-import { Socket } from "socket.io"
-const io = require("socket.io")(server)
+import { Server } from "ws"
+import Turtle from "./turtle"
+const wss = new Server({ port: 8081 })
 
-server.listen(8080, () => {
-  console.log("Server started")
+wss.on("listening", () => {
+  console.log("listening")
 })
 
-io.on("connection", (socket: Socket) => {
-  console.log("Client connected")
-  socket.on("disconnect", () => {
-    console.log("Client disconnected")
-  })
+wss.on("connection", async (ws) => {
+  new Turtle(ws)
 })
