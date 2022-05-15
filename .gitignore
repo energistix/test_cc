@@ -5,6 +5,6 @@ node_modules
 package-lock.json
 dist
 .vscode
-prisma\data.db-journal
-prisma\data.db
-prisma\migrations
+prisma/data.db-journal
+prisma/data.db
+prisma/migrations
