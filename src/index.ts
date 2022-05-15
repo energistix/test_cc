@@ -1,5 +1,6 @@
 console.clear()
 
+import { readFileSync, writeFileSync } from "fs"
 import { Server } from "ws"
 import Turtle from "./turtle"
 const wss = new Server({ port: 8081 })
