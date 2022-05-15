@@ -16,7 +16,7 @@ export default class Turtle extends EventEmitter {
     })
   }
 
-  eval(code: string) {
+  eval(code: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this.ws.send(code)
       this.once("message", (message: Message) => {
