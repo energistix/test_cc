@@ -4,31 +4,34 @@ import { readFileSync, writeFileSync } from "fs"
 import { WebSocket } from "ws"
 
 const db = new PrismaClient()
-let names = readFileSync("./names.txt", "utf8").split("\n")
-
+db.turtle.deleteMany()
 export type Message = {
-  err: boolean
+  error: boolean
   data: string
 }
 
+export type turtleData = {
+  id: number
+}
+
 export default class Turtle extends EventEmitter {
-  static turtles: Turtle[] = []
-  label: string
+  static turtles: Map<number, Turtle> = new Map()
+  data: turtleData
   constructor(private ws: WebSocket) {
     super()
-    Turtle.turtles.push(this)
+
     ws.on("message", (message) => {
       this.emit("message", message)
     })
-    this.eval("return os.computerLabel()").then((label) => {
-      if (!label) {
-        const name = names[Math.floor(Math.random() * names.length)]
-        names = names.filter((n) => n !== name)
-        writeFileSync("./names.txt", names.join("\n"))
-        this.eval('return os.setComputerLabel("' + name + '")')
-      } else this.label = label
-      db.turtle.findUnique({ where: { label: this.label } }).then((turtle) => {
-        if (!turtle) db.turtle.create({ data: { label: this.label } })
+
+    this.eval("return os.getComputerID()").then(async (id) => {
+      let data = await db.turtle.findFirst({ where: { id: Number(id) } })
+      if (!data) data = await db.turtle.create({ data: { id: Number(id) } })
+      this.data = data
+      Turtle.turtles.set(Number(id), this)
+
+      ws.on("close", () => {
+        Turtle.turtles.delete(this.data.id)
       })
     })
   }
@@ -38,7 +41,7 @@ export default class Turtle extends EventEmitter {
       this.ws.send(code)
       this.once("message", (message: Message) => {
         message = JSON.parse(message.toString())
-        message.err ? reject(message.data) : resolve(message.data)
+        message.error ? reject(message.data) : resolve(message.data)
       })
     })
   }
